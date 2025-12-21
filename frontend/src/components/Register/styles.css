@@ -1,0 +1,10 @@
+#register-box {
+    width: min(100%, 400px);
+    margin: auto;
+    text-align: center;
+}
+
+#register-box * {
+    display: block;
+    margin-bottom: 10px;
+}

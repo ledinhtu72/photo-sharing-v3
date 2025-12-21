@@ -1,0 +1,8 @@
+.photo-detail {
+    width: 100%;
+    max-width: 800px;
+    max-height: 400px;
+    display: block;
+    margin: auto;
+    object-fit: contain;
+}
