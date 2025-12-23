@@ -1,0 +1,14 @@
+.comment-card {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+.comment-card .thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 4px;
+}
