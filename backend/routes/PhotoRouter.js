@@ -58,6 +58,33 @@ router.post("/detail/:photoId/comment", async (request, response) => {
   response.json(photo);
 });
 
+// Toggle like for a photo by userId in request body
+router.post("/:photoId/like", async (request, response) => {
+  try {
+    const { photoId } = request.params;
+    const { userId } = request.body;
+    const photo = await Photo.findOne({ _id: photoId });
+
+    if (!photo) {
+      return response.status(404).json({ message: "Photo not found" });
+    }
+
+    const idx = photo.likes.findIndex((id) => id.toString() === userId);
+    if (idx === -1) {
+      // add like
+      photo.likes.push(userId);
+    } else {
+      // remove like
+      photo.likes.splice(idx, 1);
+    }
+
+    await photo.save();
+    response.status(200).json(photo);
+  } catch (error) {
+    response.status(500).json({ message: error.message });
+  }
+});
+
 router.delete("/:photoId", async (request, response) => {
   try {
     const { photoId } = request.params;

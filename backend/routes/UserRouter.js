@@ -64,6 +64,35 @@ router.get("/:id/comments", async (request, response) => {
   }
 });
 
+// Search users by name or username
+router.get("/search", async (request, response) => {
+  try {
+    const q = request.query.q || "";
+    const regex = new RegExp(q, "i");
+    const users = await User.find({
+      $or: [{ first_name: regex }, { last_name: regex }, { username: regex }],
+    });
+
+    const usersWithCounts = await Promise.all(
+      users.map(async (u) => {
+        const photoCount = await Photo.countDocuments({ user_id: u._id });
+        const commentCountAgg = await Photo.aggregate([
+          { $unwind: "$comments" },
+          { $match: { "comments.user._id": u._id } },
+          { $count: "count" },
+        ]);
+        const commentCount =
+          commentCountAgg.length > 0 ? commentCountAgg[0].count : 0;
+        return { ...u.toObject(), photoCount, commentCount };
+      })
+    );
+
+    response.json(usersWithCounts);
+  } catch (error) {
+    response.status(500).json({ message: error.message });
+  }
+});
+
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 

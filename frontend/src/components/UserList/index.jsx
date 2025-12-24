@@ -6,6 +6,7 @@ import {
   ListItemText,
   Box,
   Chip,
+  TextField,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +16,7 @@ function UserList() {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,8 +28,36 @@ function UserList() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchSearch = async () => {
+      if (!search || search.trim() === "") {
+        const res = await fetch(`${API_URL}/api/user/list`);
+        const data = await res.json();
+        setUsers(data);
+        return;
+      }
+      const res = await fetch(
+        `${API_URL}/api/user/search?q=${encodeURIComponent(search)}`
+      );
+      const data = await res.json();
+      setUsers(data);
+    };
+
+    const t = setTimeout(fetchSearch, 300);
+    return () => clearTimeout(t);
+  }, [search]);
+
   return (
     <div>
+      <Box sx={{ padding: 1 }}>
+        <TextField
+          placeholder="Search users..."
+          size="small"
+          fullWidth
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </Box>
       <List component="nav">
         {users.map((user) => (
           <div key={user._id}>

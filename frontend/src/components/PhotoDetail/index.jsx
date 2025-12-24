@@ -2,13 +2,14 @@ import "./styles.css";
 import { useEffect, useState } from "react";
 import {
   Box,
-  Button,
-  Link,
+        <Button
+          variant={photo.likes && photo.likes.some((id) => id.toString() === user._id) ? "contained" : "outlined"}
   TextField,
   Typography,
   IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useParams, useNavigate } from "react-router-dom";
 
 function PhotoDetail({ user }) {
@@ -84,6 +85,27 @@ function PhotoDetail({ user }) {
     }
   };
 
+  const handleToggleLike = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/photo/${photoId}/like`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: user._id }),
+      });
+      if (res.status === 200) {
+        const updatedPhoto = await res.json();
+        setPhoto(updatedPhoto);
+      } else {
+        alert("Error toggling like");
+      }
+    } catch (error) {
+      alert("Error toggling like: " + error.message);
+    }
+  };
+
   const handleDeletePhoto = async () => {
     if (!window.confirm("Are you sure you want to delete this photo?")) {
       return;
@@ -123,6 +145,20 @@ function PhotoDetail({ user }) {
           </Button>
         </Box>
       )}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1 }}>
+        <Button
+          variant={
+            photo.likes && photo.likes.includes(user._id)
+              ? "contained"
+              : "outlined"
+          }
+          color="primary"
+          startIcon={<FavoriteIcon />}
+          onClick={handleToggleLike}
+        >
+          {photo.likes ? photo.likes.length : 0}
+        </Button>
+      </Box>
       <hr />
       <Typography variant="h5">COMMENTS</Typography>
       {photo.comments.map((comment) => (
